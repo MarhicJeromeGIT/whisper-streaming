@@ -48,7 +48,7 @@ def transcribe(
     word_timestamps: bool = False,
     prepend_punctuations: str = "\"'“¿([{-",
     append_punctuations: str = "\"'.。,，!！?？:：”)]}、",
-    streamer: Optional[any] = None,
+    should_yield: Optional[bool] = False,
     **decode_options,
 ):
     """
@@ -343,15 +343,15 @@ def transcribe(
                     if seek_shift > 0:
                         seek = previous_seek + seek_shift
 
-            if verbose or streamer:
+            if verbose or should_yield:
                 for segment in current_segments:
                     start, end, text = segment["start"], segment["end"], segment["text"]
                     line = f"[{format_timestamp(start)} --> {format_timestamp(end)}] {text}"
                     safe_line = make_safe(line)
                     if verbose:
                       print(safe_line)
-                    if streamer is not None:
-                        streamer.put(safe_line)
+                    if should_yield:
+                        yield safe_line
 
             # if a segment is instantaneous or does not contain text, clear it
             for i, segment in enumerate(current_segments):
